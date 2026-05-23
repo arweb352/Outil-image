@@ -1,0 +1,402 @@
+<!--
+  OUTIL GRILLE 3×3 — WordPress
+  ─────────────────────────────
+  Coller ce bloc dans un "Bloc HTML personnalisé" WordPress.
+  Aucun plugin requis. Aucune dépendance externe.
+  Testél avec Gutenberg (WordPress 6+).
+-->
+
+<style>
+#igt *,#igt *::before,#igt *::after{box-sizing:border-box;margin:0;padding:0}
+#igt{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:860px;margin:0 auto;padding:24px 16px;color:#222}
+#igt h2{font-size:1.4rem;font-weight:700;margin-bottom:6px;text-align:center}
+#igt .igt-subtitle{text-align:center;color:#666;font-size:.9rem;margin-bottom:20px}
+
+/* Zone upload */
+#igt .igt-upload{border:2px dashed #bbb;border-radius:10px;padding:32px 20px;text-align:center;background:#fafafa;transition:border-color .2s,background .2s;cursor:pointer;user-select:none}
+#igt .igt-upload.over{border-color:#2271b1;background:#eef5fb}
+#igt .igt-upload svg{display:block;margin:0 auto 12px;opacity:.4}
+#igt .igt-upload p{color:#555;font-size:.95rem;margin-bottom:12px}
+#igt .igt-upload small{color:#999;font-size:.8rem}
+#igt .igt-upload input[type=file]{display:none}
+#igt .igt-btn-upload{display:inline-block;margin-top:12px;padding:8px 22px;background:#2271b1;color:#fff;border:none;border-radius:6px;font-size:.9rem;cursor:pointer;transition:background .2s}
+#igt .igt-btn-upload:hover{background:#135e96}
+
+/* Compteur */
+#igt .igt-counter{text-align:center;margin:14px 0 4px;font-size:.88rem;color:#666}
+#igt .igt-counter span{font-weight:700;color:#2271b1}
+
+/* Grille de prévisualisation */
+#igt .igt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 20px}
+#igt .igt-slot{position:relative;aspect-ratio:1/1;border:2px dashed #ddd;border-radius:8px;background:#f3f3f3;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .2s,box-shadow .2s,transform .15s}
+#igt .igt-slot.filled{border-style:solid;border-color:#2271b1;cursor:grab}
+#igt .igt-slot.filled:active{cursor:grabbing}
+#igt .igt-slot.drag-target{border-color:#f0b429;box-shadow:0 0 0 3px #f0b42940;transform:scale(1.04)}
+#igt .igt-slot.drag-source{opacity:.5}
+#igt .igt-slot .igt-num{position:absolute;top:5px;left:7px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7);z-index:2;pointer-events:none}
+#igt .igt-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+#igt .igt-slot .igt-empty{color:#ccc;font-size:.8rem;text-align:center;pointer-events:none;line-height:1.4}
+#igt .igt-slot .igt-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(200,40,40,.85);color:#fff;border:none;border-radius:50%;font-size:14px;line-height:22px;text-align:center;cursor:pointer;z-index:3;display:none;padding:0;transition:background .15s}
+#igt .igt-slot .igt-del:hover{background:rgba(180,20,20,1)}
+#igt .igt-slot.filled .igt-del{display:block}
+
+/* Bouton créer */
+#igt .igt-actions{text-align:center;margin-bottom:16px}
+#igt .igt-btn-create{padding:12px 48px;background:#1d8348;color:#fff;border:none;border-radius:8px;font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .2s,opacity .2s;letter-spacing:.02em}
+#igt .igt-btn-create:hover:not(:disabled){background:#176a3b}
+#igt .igt-btn-create:disabled{opacity:.4;cursor:not-allowed}
+
+/* Progress */
+#igt .igt-progress{display:none;text-align:center;padding:10px;color:#888;font-size:.9rem;font-style:italic}
+
+/* Résultat */
+#igt .igt-result{display:none;text-align:center;border-top:1px solid #eee;padding-top:24px;margin-top:8px}
+#igt .igt-result h3{font-size:1.1rem;margin-bottom:14px;color:#1d8348}
+#igt .igt-result-wrap{display:inline-block;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);max-width:100%}
+#igt .igt-result-wrap img{display:block;max-width:100%;height:auto}
+#igt .igt-btn-dl{display:inline-block;margin-top:16px;padding:10px 34px;background:#2271b1;color:#fff;text-decoration:none;border-radius:7px;font-size:.95rem;font-weight:600;transition:background .2s}
+#igt .igt-btn-dl:hover{background:#135e96;color:#fff}
+#igt .igt-reset{display:inline-block;margin-top:10px;margin-left:12px;padding:10px 24px;background:#fff;color:#c0392b;border:1px solid #c0392b;text-decoration:none;border-radius:7px;font-size:.9rem;cursor:pointer;transition:background .2s,color .2s}
+#igt .igt-reset:hover{background:#c0392b;color:#fff}
+
+/* Options */
+#igt .igt-options{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:16px;font-size:.88rem;color:#555}
+#igt .igt-options label{display:flex;align-items:center;gap:6px;cursor:pointer}
+#igt .igt-options select{padding:3px 8px;border:1px solid #ccc;border-radius:4px;font-size:.88rem;cursor:pointer}
+</style>
+
+<div id="igt">
+  <h2>Créateur de grille 3×3</h2>
+  <p class="igt-subtitle">Chargez 9 images, réorganisez-les par glisser-déposer, puis générez votre grille.</p>
+
+  <!-- Zone d'upload -->
+  <div class="igt-upload" id="igtUploadZone">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <p>Glissez vos images ici</p>
+    <small>JPG · PNG · WEBP · GIF · BMP · AVIF</small><br>
+    <button class="igt-btn-upload" type="button" id="igtPickBtn">Choisir des images</button>
+    <input type="file" id="igtFileInput" accept="image/*" multiple>
+  </div>
+
+  <div class="igt-counter">Images chargées : <span id="igtCountSpan">0</span> / 9</div>
+
+  <!-- Grille de prévisualisation -->
+  <div class="igt-grid" id="igtGrid"></div>
+
+  <!-- Options de rendu -->
+  <div class="igt-options">
+    <label>
+      Taille par cellule :
+      <select id="igtCellSize">
+        <option value="400">Légère (1200×1200 px)</option>
+        <option value="600" selected>Standard (1800×1800 px)</option>
+        <option value="800">Haute qualité (2400×2400 px)</option>
+      </select>
+    </label>
+    <label>
+      Espacement :
+      <select id="igtGap">
+        <option value="0">Aucun</option>
+        <option value="4" selected>Fin (4 px)</option>
+        <option value="10">Moyen (10 px)</option>
+        <option value="20">Large (20 px)</option>
+      </select>
+    </label>
+    <label>
+      Fond :
+      <input type="color" id="igtBgColor" value="#ffffff" style="width:32px;height:26px;padding:1px;border:1px solid #ccc;border-radius:4px;cursor:pointer">
+    </label>
+  </div>
+
+  <!-- Bouton créer -->
+  <div class="igt-actions">
+    <button class="igt-btn-create" id="igtCreateBtn" disabled type="button">Créer la grille 3×3</button>
+  </div>
+
+  <div class="igt-progress" id="igtProgress">Génération en cours…</div>
+
+  <!-- Résultat -->
+  <div class="igt-result" id="igtResult">
+    <h3>Votre grille est prête !</h3>
+    <div class="igt-result-wrap">
+      <img id="igtResultImg" alt="Grille 3×3">
+    </div>
+    <br>
+    <a id="igtDownloadLink" class="igt-btn-dl" download="grille-3x3.jpg">Télécharger (JPG)</a>
+    <button class="igt-reset" id="igtResetBtn" type="button">Recommencer</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── État ── */
+  var slots = new Array(9).fill(null); // {dataUrl, imgEl}
+  var dragSrc = null;
+
+  /* ── Éléments ── */
+  var grid        = document.getElementById('igtGrid');
+  var fileInput   = document.getElementById('igtFileInput');
+  var pickBtn     = document.getElementById('igtPickBtn');
+  var uploadZone  = document.getElementById('igtUploadZone');
+  var countSpan   = document.getElementById('igtCountSpan');
+  var createBtn   = document.getElementById('igtCreateBtn');
+  var progressDiv = document.getElementById('igtProgress');
+  var resultDiv   = document.getElementById('igtResult');
+  var resultImg   = document.getElementById('igtResultImg');
+  var dlLink      = document.getElementById('igtDownloadLink');
+  var resetBtn    = document.getElementById('igtResetBtn');
+  var cellSizeSel = document.getElementById('igtCellSize');
+  var gapSel      = document.getElementById('igtGap');
+  var bgColorIn   = document.getElementById('igtBgColor');
+
+  /* ── Construction des 9 slots ── */
+  for (var i = 0; i < 9; i++) {
+    (function (idx) {
+      var slot = document.createElement('div');
+      slot.className = 'igt-slot';
+      slot.dataset.idx = idx;
+
+      var num = document.createElement('span');
+      num.className = 'igt-num';
+      num.textContent = idx + 1;
+
+      var empty = document.createElement('div');
+      empty.className = 'igt-empty';
+      empty.innerHTML = 'Cliquer<br>pour ajouter';
+
+      var del = document.createElement('button');
+      del.className = 'igt-del';
+      del.type = 'button';
+      del.title = 'Supprimer';
+      del.textContent = '×';
+
+      slot.appendChild(num);
+      slot.appendChild(empty);
+      slot.appendChild(del);
+      grid.appendChild(slot);
+
+      /* Clic sur slot vide → ouvre un sélecteur de fichier dédié */
+      slot.addEventListener('click', function (e) {
+        if (e.target === del) return;
+        if (slots[idx]) return; // déjà rempli
+        var tmp = document.createElement('input');
+        tmp.type = 'file';
+        tmp.accept = 'image/*';
+        tmp.onchange = function () {
+          if (tmp.files[0]) loadFileIntoSlot(tmp.files[0], idx);
+        };
+        tmp.click();
+      });
+
+      /* Supprimer */
+      del.addEventListener('click', function (e) {
+        e.stopPropagation();
+        slots[idx] = null;
+        renderSlot(idx);
+        updateUI();
+      });
+
+      /* Drag & drop entre slots */
+      slot.setAttribute('draggable', 'true');
+      slot.addEventListener('dragstart', function (e) {
+        if (!slots[idx]) { e.preventDefault(); return; }
+        dragSrc = idx;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(function () { slot.classList.add('drag-source'); }, 0);
+      });
+      slot.addEventListener('dragend', function () {
+        slot.classList.remove('drag-source');
+        dragSrc = null;
+      });
+      slot.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        if (dragSrc !== null && dragSrc !== idx)
+          slot.classList.add('drag-target');
+      });
+      slot.addEventListener('dragleave', function () {
+        slot.classList.remove('drag-target');
+      });
+      slot.addEventListener('drop', function (e) {
+        e.preventDefault();
+        slot.classList.remove('drag-target');
+        if (dragSrc === null || dragSrc === idx) return;
+        var tmp = slots[dragSrc];
+        slots[dragSrc] = slots[idx];
+        slots[idx] = tmp;
+        renderSlot(dragSrc);
+        renderSlot(idx);
+        updateUI();
+      });
+    })(i);
+  }
+
+  /* ── Rendu d'un slot ── */
+  function renderSlot(idx) {
+    var slot  = grid.children[idx];
+    var empty = slot.querySelector('.igt-empty');
+    var img   = slot.querySelector('img');
+
+    if (slots[idx]) {
+      slot.classList.add('filled');
+      if (!img) {
+        img = document.createElement('img');
+        img.alt = 'Image ' + (idx + 1);
+        slot.insertBefore(img, empty);
+      }
+      img.src = slots[idx].dataUrl;
+      empty.style.display = 'none';
+    } else {
+      slot.classList.remove('filled');
+      if (img) img.remove();
+      empty.style.display = '';
+    }
+  }
+
+  /* ── Mise à jour du compteur & bouton ── */
+  function updateUI() {
+    var count = slots.filter(Boolean).length;
+    countSpan.textContent = count;
+    createBtn.disabled = count < 9;
+  }
+
+  /* ── Charge un fichier dans un slot ── */
+  function loadFileIntoSlot(file, idx) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var dataUrl = e.target.result;
+      var imgEl = new Image();
+      imgEl.onload = function () {
+        slots[idx] = { dataUrl: dataUrl, imgEl: imgEl };
+        renderSlot(idx);
+        updateUI();
+      };
+      imgEl.onerror = function () {
+        alert('Impossible de lire l\'image : ' + file.name);
+      };
+      imgEl.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ── Assigne plusieurs fichiers aux slots vides dans l'ordre ── */
+  function assignFiles(files) {
+    var si = 0;
+    for (var fi = 0; fi < files.length; fi++) {
+      if (si >= 9) break;
+      while (si < 9 && slots[si]) si++;
+      if (si >= 9) break;
+      if (files[fi].type.startsWith('image/') || files[fi].name.match(/\.(avif|heic|heif)$/i)) {
+        loadFileIntoSlot(files[fi], si);
+      }
+      si++;
+    }
+  }
+
+  /* ── Entrées fichier ── */
+  pickBtn.addEventListener('click', function () { fileInput.click(); });
+  fileInput.addEventListener('change', function () {
+    assignFiles(Array.from(fileInput.files));
+    fileInput.value = '';
+  });
+
+  /* ── Drag & drop sur la zone d'upload ── */
+  uploadZone.addEventListener('dragover', function (e) {
+    e.preventDefault();
+    uploadZone.classList.add('over');
+  });
+  uploadZone.addEventListener('dragleave', function () {
+    uploadZone.classList.remove('over');
+  });
+  uploadZone.addEventListener('drop', function (e) {
+    e.preventDefault();
+    uploadZone.classList.remove('over');
+    assignFiles(Array.from(e.dataTransfer.files));
+  });
+
+  /* ── Création de la grille ── */
+  createBtn.addEventListener('click', function () {
+    var count = slots.filter(Boolean).length;
+    if (count < 9) return;
+
+    var cellSize = parseInt(cellSizeSel.value, 10);
+    var gap      = parseInt(gapSel.value, 10);
+    var bgColor  = bgColorIn.value;
+    var total    = cellSize * 3 + gap * 2;
+
+    progressDiv.style.display = 'block';
+    resultDiv.style.display   = 'none';
+    createBtn.disabled        = true;
+
+    /* setTimeout 0 pour laisser le DOM se mettre à jour avant le calcul lourd */
+    setTimeout(function () {
+      try {
+        var canvas = document.createElement('canvas');
+        canvas.width  = total;
+        canvas.height = total;
+        var ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, total, total);
+
+        for (var i = 0; i < 9; i++) {
+          var row = Math.floor(i / 3);
+          var col = i % 3;
+          var x   = col * (cellSize + gap);
+          var y   = row * (cellSize + gap);
+
+          var src = slots[i].imgEl;
+          var sw  = src.naturalWidth;
+          var sh  = src.naturalHeight;
+
+          /* Recadrage centré (object-fit: cover) */
+          var sSize, sx, sy;
+          if (sw > sh) {
+            sSize = sh;
+            sx = Math.floor((sw - sh) / 2);
+            sy = 0;
+          } else {
+            sSize = sw;
+            sx = 0;
+            sy = Math.floor((sh - sw) / 2);
+          }
+
+          ctx.drawImage(src, sx, sy, sSize, sSize, x, y, cellSize, cellSize);
+        }
+
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.93);
+        resultImg.src   = dataUrl;
+        dlLink.href     = dataUrl;
+
+        progressDiv.style.display = 'none';
+        resultDiv.style.display   = 'block';
+        createBtn.disabled        = false;
+
+        /* Scroll doux vers le résultat */
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        progressDiv.style.display = 'none';
+        createBtn.disabled = false;
+        alert('Erreur lors de la création : ' + err.message + '\n\nAssurez-vous que toutes les images sont accessibles (pas de blocage CORS).');
+      }
+    }, 50);
+  });
+
+  /* ── Réinitialisation ── */
+  resetBtn.addEventListener('click', function () {
+    slots = new Array(9).fill(null);
+    for (var i = 0; i < 9; i++) renderSlot(i);
+    updateUI();
+    resultDiv.style.display = 'none';
+    uploadZone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  updateUI();
+})();
+</script>
