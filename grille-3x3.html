@@ -13,14 +13,18 @@
 #igt .igt-subtitle{text-align:center;color:#666;font-size:.9rem;margin-bottom:20px}
 
 /* Zone upload */
-#igt .igt-upload{border:2px dashed #bbb;border-radius:10px;padding:32px 20px;text-align:center;background:#fafafa;transition:border-color .2s,background .2s;cursor:pointer;user-select:none}
+#igt .igt-upload{border:2px dashed #bbb;border-radius:10px;padding:32px 20px;text-align:center;background:#fafafa;transition:border-color .2s,background .2s;user-select:none}
 #igt .igt-upload.over{border-color:#2271b1;background:#eef5fb}
 #igt .igt-upload svg{display:block;margin:0 auto 12px;opacity:.4}
 #igt .igt-upload p{color:#555;font-size:.95rem;margin-bottom:12px}
 #igt .igt-upload small{color:#999;font-size:.8rem}
-#igt .igt-upload input[type=file]{display:none}
-#igt .igt-btn-upload{display:inline-block;margin-top:12px;padding:8px 22px;background:#2271b1;color:#fff;border:none;border-radius:6px;font-size:.9rem;cursor:pointer;transition:background .2s}
+/* L'input est hors-écran mais bien dans le DOM — le <label for> le déclenche nativement sur mobile */
+#igt #igtFileInput{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#igt .igt-btn-upload{display:inline-block;margin-top:12px;padding:8px 22px;background:#2271b1;color:#fff;border:none;border-radius:6px;font-size:.9rem;cursor:pointer;transition:background .2s;-webkit-appearance:none}
 #igt .igt-btn-upload:hover{background:#135e96}
+/* Input natif dans chaque slot — seule approche fiable sur iOS */
+#igt .igt-slot .igt-slot-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:4;-webkit-appearance:none}
+#igt .igt-slot.filled .igt-slot-input{display:none}
 
 /* Compteur */
 #igt .igt-counter{text-align:center;margin:14px 0 4px;font-size:.88rem;color:#666}
@@ -78,7 +82,8 @@
     </svg>
     <p>Glissez vos images ici</p>
     <small>JPG · PNG · WEBP · GIF · BMP · AVIF</small><br>
-    <button class="igt-btn-upload" type="button" id="igtPickBtn">Choisir des images</button>
+    <!-- label + for = déclenchement natif, fonctionne sur iOS/Android sans JS -->
+    <label class="igt-btn-upload" for="igtFileInput">Choisir des images</label>
     <input type="file" id="igtFileInput" accept="image/*" multiple>
   </div>
 
@@ -142,7 +147,6 @@
   /* ── Éléments ── */
   var grid        = document.getElementById('igtGrid');
   var fileInput   = document.getElementById('igtFileInput');
-  var pickBtn     = document.getElementById('igtPickBtn');
   var uploadZone  = document.getElementById('igtUploadZone');
   var countSpan   = document.getElementById('igtCountSpan');
   var createBtn   = document.getElementById('igtCreateBtn');
@@ -176,23 +180,23 @@
       del.title = 'Supprimer';
       del.textContent = '×';
 
+      /* Input natif dans le slot — seule méthode fiable sur iOS */
+      var slotInput = document.createElement('input');
+      slotInput.type = 'file';
+      slotInput.accept = 'image/*';
+      slotInput.className = 'igt-slot-input';
+      slotInput.addEventListener('change', function () {
+        if (slotInput.files[0]) {
+          loadFileIntoSlot(slotInput.files[0], idx);
+          slotInput.value = '';
+        }
+      });
+
       slot.appendChild(num);
       slot.appendChild(empty);
       slot.appendChild(del);
+      slot.appendChild(slotInput);
       grid.appendChild(slot);
-
-      /* Clic sur slot vide → ouvre un sélecteur de fichier dédié */
-      slot.addEventListener('click', function (e) {
-        if (e.target === del) return;
-        if (slots[idx]) return; // déjà rempli
-        var tmp = document.createElement('input');
-        tmp.type = 'file';
-        tmp.accept = 'image/*';
-        tmp.onchange = function () {
-          if (tmp.files[0]) loadFileIntoSlot(tmp.files[0], idx);
-        };
-        tmp.click();
-      });
 
       /* Supprimer */
       del.addEventListener('click', function (e) {
@@ -298,8 +302,7 @@
     }
   }
 
-  /* ── Entrées fichier ── */
-  pickBtn.addEventListener('click', function () { fileInput.click(); });
+  /* ── Entrée fichier principale (label for déclenche nativement) ── */
   fileInput.addEventListener('change', function () {
     assignFiles(Array.from(fileInput.files));
     fileInput.value = '';
