@@ -3,7 +3,6 @@
   ─────────────────────────────
   Coller ce bloc dans un "Bloc HTML personnalisé" WordPress.
   Aucun plugin requis. Aucune dépendance externe.
-  Testél avec Gutenberg (WordPress 6+).
 -->
 
 <style>
@@ -13,45 +12,90 @@
 #igt .igt-subtitle{text-align:center;color:#666;font-size:.9rem;margin-bottom:20px}
 
 /* Zone upload */
-#igt .igt-upload{border:2px dashed #bbb;border-radius:10px;padding:32px 20px;text-align:center;background:#fafafa;transition:border-color .2s,background .2s;user-select:none}
+#igt .igt-upload{border:2px dashed #bbb;border-radius:10px;padding:28px 20px;text-align:center;background:#fafafa;transition:border-color .2s,background .2s;user-select:none}
 #igt .igt-upload.over{border-color:#2271b1;background:#eef5fb}
 #igt .igt-upload svg{display:block;margin:0 auto 12px;opacity:.4}
-#igt .igt-upload p{color:#555;font-size:.95rem;margin-bottom:12px}
+#igt .igt-upload p{color:#555;font-size:.95rem;margin-bottom:10px}
 #igt .igt-upload small{color:#999;font-size:.8rem}
-/* L'input est hors-écran mais bien dans le DOM — le <label for> le déclenche nativement sur mobile */
 #igt #igtFileInput{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-#igt .igt-btn-upload{display:inline-block;margin-top:12px;padding:8px 22px;background:#2271b1;color:#fff;border:none;border-radius:6px;font-size:.9rem;cursor:pointer;transition:background .2s;-webkit-appearance:none}
+#igt .igt-btn-upload{display:inline-block;margin-top:12px;padding:9px 24px;background:#2271b1;color:#fff;border:none;border-radius:6px;font-size:.9rem;cursor:pointer;transition:background .2s;-webkit-appearance:none}
 #igt .igt-btn-upload:hover{background:#135e96}
-/* Input natif dans chaque slot — seule approche fiable sur iOS */
-#igt .igt-slot .igt-slot-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:4;-webkit-appearance:none}
-#igt .igt-slot.filled .igt-slot-input{display:none}
 
-/* Compteur */
-#igt .igt-counter{text-align:center;margin:14px 0 4px;font-size:.88rem;color:#666}
-#igt .igt-counter span{font-weight:700;color:#2271b1}
+/* Barre de progression */
+#igt .igt-progress-wrap{margin:14px 0 4px}
+#igt .igt-counter-text{text-align:center;font-size:.88rem;color:#666;margin-bottom:6px}
+#igt .igt-counter-text strong{color:#2271b1}
+#igt .igt-bar-track{height:8px;background:#e8e8e8;border-radius:4px;overflow:hidden}
+#igt .igt-bar-fill{height:100%;width:0;background:linear-gradient(90deg,#2271b1,#27ae60);border-radius:4px;transition:width .35s ease}
 
-/* Grille de prévisualisation */
-#igt .igt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 20px}
-#igt .igt-slot{position:relative;aspect-ratio:1/1;border:2px dashed #ddd;border-radius:8px;background:#f3f3f3;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .2s,box-shadow .2s,transform .15s}
+/* Grille */
+#igt .igt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 16px}
+#igt .igt-slot{position:relative;aspect-ratio:1/1;border:2px dashed #ddd;border-radius:8px;background:#f3f3f3;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:border-color .25s,box-shadow .25s,transform .15s}
 #igt .igt-slot.filled{border-style:solid;border-color:#2271b1;cursor:grab}
 #igt .igt-slot.filled:active{cursor:grabbing}
 #igt .igt-slot.drag-target{border-color:#f0b429;box-shadow:0 0 0 3px #f0b42940;transform:scale(1.04)}
-#igt .igt-slot.drag-source{opacity:.5}
+#igt .igt-slot.drag-source{opacity:.45}
+
+/* États de chargement */
+#igt .igt-slot.igt-loading{border-style:solid;border-color:#aac8e8}
+#igt .igt-slot.igt-success{border-color:#27ae60 !important;box-shadow:0 0 0 3px #27ae6030}
+#igt .igt-slot.igt-error{border-style:solid;border-color:#e74c3c;background:#fff5f5}
+
+/* Numéro */
 #igt .igt-slot .igt-num{position:absolute;top:5px;left:7px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7);z-index:2;pointer-events:none}
+
+/* Image */
 #igt .igt-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-#igt .igt-slot .igt-empty{color:#ccc;font-size:.8rem;text-align:center;pointer-events:none;line-height:1.4}
-#igt .igt-slot .igt-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(200,40,40,.85);color:#fff;border:none;border-radius:50%;font-size:14px;line-height:22px;text-align:center;cursor:pointer;z-index:3;display:none;padding:0;transition:background .15s}
+
+/* Texte slot vide */
+#igt .igt-slot .igt-empty{color:#ccc;font-size:.78rem;text-align:center;pointer-events:none;line-height:1.5}
+
+/* Spinner */
+#igt .igt-slot .igt-spinner{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.75);z-index:3;flex-direction:column;gap:8px}
+#igt .igt-slot.igt-loading .igt-spinner{display:flex}
+#igt .igt-spinner-ring{width:30px;height:30px;border:3px solid #dde;border-top-color:#2271b1;border-radius:50%;animation:igt-spin .7s linear infinite}
+#igt .igt-spinner-txt{font-size:.7rem;color:#888}
+@keyframes igt-spin{to{transform:rotate(360deg)}}
+
+/* Message d'erreur dans le slot */
+#igt .igt-slot .igt-err-label{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:6px;text-align:center;pointer-events:none;gap:4px}
+#igt .igt-slot.igt-error .igt-err-label{display:flex}
+#igt .igt-err-icon{font-size:1.4rem;line-height:1}
+#igt .igt-err-txt{font-size:.7rem;color:#c0392b;line-height:1.3}
+#igt .igt-err-retry{font-size:.68rem;color:#888;margin-top:2px}
+
+/* Icône succès (flash) */
+#igt .igt-slot .igt-ok-icon{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(39,174,96,.15);z-index:3;font-size:2rem;animation:igt-ok-fade .6s ease forwards}
+#igt .igt-slot.igt-success .igt-ok-icon{display:flex}
+@keyframes igt-ok-fade{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
+
+/* Bouton supprimer */
+#igt .igt-slot .igt-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(200,40,40,.85);color:#fff;border:none;border-radius:50%;font-size:15px;line-height:22px;text-align:center;cursor:pointer;z-index:5;display:none;padding:0;transition:background .15s}
 #igt .igt-slot .igt-del:hover{background:rgba(180,20,20,1)}
 #igt .igt-slot.filled .igt-del{display:block}
 
+/* Input fichier natif par slot */
+#igt .igt-slot .igt-slot-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:4;-webkit-appearance:none}
+#igt .igt-slot.filled .igt-slot-input,
+#igt .igt-slot.igt-loading .igt-slot-input{display:none}
+
 /* Bouton créer */
 #igt .igt-actions{text-align:center;margin-bottom:16px}
-#igt .igt-btn-create{padding:12px 48px;background:#1d8348;color:#fff;border:none;border-radius:8px;font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .2s,opacity .2s;letter-spacing:.02em}
+#igt .igt-btn-create{padding:12px 48px;background:#1d8348;color:#fff;border:none;border-radius:8px;font-size:1.05rem;font-weight:600;cursor:pointer;transition:background .2s,opacity .2s}
 #igt .igt-btn-create:hover:not(:disabled){background:#176a3b}
-#igt .igt-btn-create:disabled{opacity:.4;cursor:not-allowed}
+#igt .igt-btn-create:disabled{opacity:.35;cursor:not-allowed}
 
-/* Progress */
-#igt .igt-progress{display:none;text-align:center;padding:10px;color:#888;font-size:.9rem;font-style:italic}
+/* Génération en cours */
+#igt .igt-gen-progress{display:none;text-align:center;padding:12px;color:#555;font-size:.9rem}
+#igt .igt-gen-ring{display:inline-block;width:18px;height:18px;border:2px solid #ccc;border-top-color:#1d8348;border-radius:50%;animation:igt-spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+
+/* Toast notifications */
+#igt .igt-toast-area{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+#igt .igt-toast{padding:10px 16px;border-radius:8px;font-size:.85rem;font-weight:500;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.2);opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s;pointer-events:none;max-width:280px}
+#igt .igt-toast.show{opacity:1;transform:translateY(0)}
+#igt .igt-toast.ok{background:#1d8348}
+#igt .igt-toast.err{background:#c0392b}
+#igt .igt-toast.info{background:#2271b1}
 
 /* Résultat */
 #igt .igt-result{display:none;text-align:center;border-top:1px solid #eee;padding-top:24px;margin-top:8px}
@@ -60,11 +104,11 @@
 #igt .igt-result-wrap img{display:block;max-width:100%;height:auto}
 #igt .igt-btn-dl{display:inline-block;margin-top:16px;padding:10px 34px;background:#2271b1;color:#fff;text-decoration:none;border-radius:7px;font-size:.95rem;font-weight:600;transition:background .2s}
 #igt .igt-btn-dl:hover{background:#135e96;color:#fff}
-#igt .igt-reset{display:inline-block;margin-top:10px;margin-left:12px;padding:10px 24px;background:#fff;color:#c0392b;border:1px solid #c0392b;text-decoration:none;border-radius:7px;font-size:.9rem;cursor:pointer;transition:background .2s,color .2s}
-#igt .igt-reset:hover{background:#c0392b;color:#fff}
+#igt .igt-btn-reset{display:inline-block;margin-top:10px;margin-left:12px;padding:10px 24px;background:#fff;color:#c0392b;border:1px solid #c0392b;border-radius:7px;font-size:.9rem;cursor:pointer;transition:background .2s,color .2s}
+#igt .igt-btn-reset:hover{background:#c0392b;color:#fff}
 
 /* Options */
-#igt .igt-options{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:16px;font-size:.88rem;color:#555}
+#igt .igt-options{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:16px;font-size:.88rem;color:#555}
 #igt .igt-options label{display:flex;align-items:center;gap:6px;cursor:pointer}
 #igt .igt-options select{padding:3px 8px;border:1px solid #ccc;border-radius:4px;font-size:.88rem;cursor:pointer}
 </style>
@@ -75,19 +119,22 @@
 
   <!-- Zone d'upload -->
   <div class="igt-upload" id="igtUploadZone">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
       <polyline points="17 8 12 3 7 8"/>
       <line x1="12" y1="3" x2="12" y2="15"/>
     </svg>
-    <p>Glissez vos images ici</p>
+    <p>Glissez vos images ici ou sélectionnez-les</p>
     <small>JPG · PNG · WEBP · GIF · BMP · AVIF</small><br>
-    <!-- label + for = déclenchement natif, fonctionne sur iOS/Android sans JS -->
     <label class="igt-btn-upload" for="igtFileInput">Choisir des images</label>
     <input type="file" id="igtFileInput" accept="image/*" multiple>
   </div>
 
-  <div class="igt-counter">Images chargées : <span id="igtCountSpan">0</span> / 9</div>
+  <!-- Barre de progression globale -->
+  <div class="igt-progress-wrap">
+    <div class="igt-counter-text">Images chargées : <strong id="igtCountSpan">0</strong> / 9</div>
+    <div class="igt-bar-track"><div class="igt-bar-fill" id="igtBarFill"></div></div>
+  </div>
 
   <!-- Grille de prévisualisation -->
   <div class="igt-grid" id="igtGrid"></div>
@@ -122,7 +169,10 @@
     <button class="igt-btn-create" id="igtCreateBtn" disabled type="button">Créer la grille 3×3</button>
   </div>
 
-  <div class="igt-progress" id="igtProgress">Génération en cours…</div>
+  <!-- Progression génération -->
+  <div class="igt-gen-progress" id="igtGenProgress">
+    <span class="igt-gen-ring"></span>Génération de la grille en cours…
+  </div>
 
   <!-- Résultat -->
   <div class="igt-result" id="igtResult">
@@ -132,8 +182,11 @@
     </div>
     <br>
     <a id="igtDownloadLink" class="igt-btn-dl" download="grille-3x3.jpg">Télécharger (JPG)</a>
-    <button class="igt-reset" id="igtResetBtn" type="button">Recommencer</button>
+    <button class="igt-btn-reset" id="igtResetBtn" type="button">Recommencer</button>
   </div>
+
+  <!-- Zone de toasts -->
+  <div class="igt-toast-area" id="igtToastArea"></div>
 </div>
 
 <script>
@@ -141,7 +194,8 @@
   'use strict';
 
   /* ── État ── */
-  var slots = new Array(9).fill(null); // {dataUrl, imgEl}
+  // slots[i] : null | 'loading' | { dataUrl, imgEl } | { error: true, msg }
+  var slots = new Array(9).fill(null);
   var dragSrc = null;
 
   /* ── Éléments ── */
@@ -149,8 +203,9 @@
   var fileInput   = document.getElementById('igtFileInput');
   var uploadZone  = document.getElementById('igtUploadZone');
   var countSpan   = document.getElementById('igtCountSpan');
+  var barFill     = document.getElementById('igtBarFill');
   var createBtn   = document.getElementById('igtCreateBtn');
-  var progressDiv = document.getElementById('igtProgress');
+  var genProgress = document.getElementById('igtGenProgress');
   var resultDiv   = document.getElementById('igtResult');
   var resultImg   = document.getElementById('igtResultImg');
   var dlLink      = document.getElementById('igtDownloadLink');
@@ -158,6 +213,22 @@
   var cellSizeSel = document.getElementById('igtCellSize');
   var gapSel      = document.getElementById('igtGap');
   var bgColorIn   = document.getElementById('igtBgColor');
+  var toastArea   = document.getElementById('igtToastArea');
+
+  /* ── Toast ── */
+  function toast(msg, type, duration) {
+    var t = document.createElement('div');
+    t.className = 'igt-toast ' + (type || 'info');
+    t.textContent = msg;
+    toastArea.appendChild(t);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { t.classList.add('show'); });
+    });
+    setTimeout(function () {
+      t.classList.remove('show');
+      setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
+    }, duration || 3000);
+  }
 
   /* ── Construction des 9 slots ── */
   for (var i = 0; i < 9; i++) {
@@ -166,25 +237,54 @@
       slot.className = 'igt-slot';
       slot.dataset.idx = idx;
 
+      /* Numéro */
       var num = document.createElement('span');
       num.className = 'igt-num';
       num.textContent = idx + 1;
 
+      /* Texte slot vide */
       var empty = document.createElement('div');
       empty.className = 'igt-empty';
-      empty.innerHTML = 'Cliquer<br>pour ajouter';
+      empty.innerHTML = 'Appuyer<br>pour ajouter';
 
+      /* Spinner */
+      var spinner = document.createElement('div');
+      spinner.className = 'igt-spinner';
+      spinner.innerHTML = '<div class="igt-spinner-ring"></div><span class="igt-spinner-txt">Chargement…</span>';
+
+      /* Icône succès (flash) */
+      var okIcon = document.createElement('div');
+      okIcon.className = 'igt-ok-icon';
+      okIcon.textContent = '✓';
+
+      /* Erreur */
+      var errLabel = document.createElement('div');
+      errLabel.className = 'igt-err-label';
+      errLabel.innerHTML = '<span class="igt-err-icon">⚠️</span><span class="igt-err-txt">Échec du chargement</span><span class="igt-err-retry">Appuyer pour réessayer</span>';
+
+      /* Bouton supprimer */
       var del = document.createElement('button');
       del.className = 'igt-del';
       del.type = 'button';
       del.title = 'Supprimer';
       del.textContent = '×';
 
-      /* Input natif dans le slot — seule méthode fiable sur iOS */
+      /* Input fichier natif — seule méthode fiable sur mobile */
       var slotInput = document.createElement('input');
       slotInput.type = 'file';
       slotInput.accept = 'image/*';
       slotInput.className = 'igt-slot-input';
+
+      slot.appendChild(num);
+      slot.appendChild(empty);
+      slot.appendChild(spinner);
+      slot.appendChild(okIcon);
+      slot.appendChild(errLabel);
+      slot.appendChild(del);
+      slot.appendChild(slotInput);
+      grid.appendChild(slot);
+
+      /* Sélection d'un fichier via l'input du slot */
       slotInput.addEventListener('change', function () {
         if (slotInput.files[0]) {
           loadFileIntoSlot(slotInput.files[0], idx);
@@ -192,24 +292,20 @@
         }
       });
 
-      slot.appendChild(num);
-      slot.appendChild(empty);
-      slot.appendChild(del);
-      slot.appendChild(slotInput);
-      grid.appendChild(slot);
-
       /* Supprimer */
       del.addEventListener('click', function (e) {
         e.stopPropagation();
         slots[idx] = null;
         renderSlot(idx);
         updateUI();
+        toast('Image ' + (idx + 1) + ' supprimée', 'info', 2000);
       });
 
       /* Drag & drop entre slots */
       slot.setAttribute('draggable', 'true');
       slot.addEventListener('dragstart', function (e) {
-        if (!slots[idx]) { e.preventDefault(); return; }
+        var s = slots[idx];
+        if (!s || s === 'loading' || s.error) { e.preventDefault(); return; }
         dragSrc = idx;
         e.dataTransfer.effectAllowed = 'move';
         setTimeout(function () { slot.classList.add('drag-source'); }, 0);
@@ -220,8 +316,7 @@
       });
       slot.addEventListener('dragover', function (e) {
         e.preventDefault();
-        if (dragSrc !== null && dragSrc !== idx)
-          slot.classList.add('drag-target');
+        if (dragSrc !== null && dragSrc !== idx) slot.classList.add('drag-target');
       });
       slot.addEventListener('dragleave', function () {
         slot.classList.remove('drag-target');
@@ -240,37 +335,75 @@
     })(i);
   }
 
-  /* ── Rendu d'un slot ── */
+  /* ── Rendu d'un slot selon son état ── */
   function renderSlot(idx) {
-    var slot  = grid.children[idx];
-    var empty = slot.querySelector('.igt-empty');
-    var img   = slot.querySelector('img');
+    var slot     = grid.children[idx];
+    var empty    = slot.querySelector('.igt-empty');
+    var spinner  = slot.querySelector('.igt-spinner');
+    var okIcon   = slot.querySelector('.igt-ok-icon');
+    var errLabel = slot.querySelector('.igt-err-label');
+    var img      = slot.querySelector('img');
+    var s        = slots[idx];
 
-    if (slots[idx]) {
+    slot.classList.remove('filled', 'igt-loading', 'igt-success', 'igt-error');
+
+    if (s === 'loading') {
+      slot.classList.add('igt-loading');
+      spinner.style.display = 'flex';
+      empty.style.display = 'none';
+      okIcon.style.display = 'none';
+      if (img) { img.remove(); img = null; }
+
+    } else if (s && s.error) {
+      slot.classList.add('igt-error');
+      spinner.style.display = 'none';
+      empty.style.display = 'none';
+      okIcon.style.display = 'none';
+      if (img) { img.remove(); }
+
+    } else if (s && s.dataUrl) {
       slot.classList.add('filled');
+      spinner.style.display = 'none';
+      empty.style.display = 'none';
       if (!img) {
         img = document.createElement('img');
         img.alt = 'Image ' + (idx + 1);
         slot.insertBefore(img, empty);
       }
-      img.src = slots[idx].dataUrl;
-      empty.style.display = 'none';
+      img.src = s.dataUrl;
+      /* Flash vert de succès */
+      slot.classList.add('igt-success');
+      okIcon.style.display = 'flex';
+      setTimeout(function () {
+        slot.classList.remove('igt-success');
+        okIcon.style.display = 'none';
+      }, 700);
+
     } else {
-      slot.classList.remove('filled');
-      if (img) img.remove();
+      /* Vide */
+      spinner.style.display = 'none';
+      okIcon.style.display = 'none';
       empty.style.display = '';
+      if (img) img.remove();
     }
   }
 
-  /* ── Mise à jour du compteur & bouton ── */
+  /* ── Mise à jour compteur + barre ── */
   function updateUI() {
-    var count = slots.filter(Boolean).length;
-    countSpan.textContent = count;
-    createBtn.disabled = count < 9;
+    var filled = slots.filter(function (s) { return s && s !== 'loading' && !s.error; }).length;
+    var loading = slots.filter(function (s) { return s === 'loading'; }).length;
+    var total = filled + loading;
+    countSpan.textContent = filled;
+    barFill.style.width = Math.round((total / 9) * 100) + '%';
+    createBtn.disabled = filled < 9;
   }
 
   /* ── Charge un fichier dans un slot ── */
   function loadFileIntoSlot(file, idx) {
+    slots[idx] = 'loading';
+    renderSlot(idx);
+    updateUI();
+
     var reader = new FileReader();
     reader.onload = function (e) {
       var dataUrl = e.target.result;
@@ -279,30 +412,49 @@
         slots[idx] = { dataUrl: dataUrl, imgEl: imgEl };
         renderSlot(idx);
         updateUI();
+        /* Toast de succès uniquement si les 9 slots sont remplis */
+        var filled = slots.filter(function (s) { return s && s !== 'loading' && !s.error; }).length;
+        if (filled === 9) {
+          toast('Toutes les images sont chargées ! Vous pouvez créer la grille.', 'ok', 4000);
+        }
       };
       imgEl.onerror = function () {
-        alert('Impossible de lire l\'image : ' + file.name);
+        slots[idx] = { error: true, msg: 'Format non supporté' };
+        renderSlot(idx);
+        updateUI();
+        toast('Image ' + (idx + 1) + ' : impossible de la décoder.', 'err');
       };
       imgEl.src = dataUrl;
+    };
+    reader.onerror = function () {
+      slots[idx] = { error: true, msg: 'Erreur de lecture' };
+      renderSlot(idx);
+      updateUI();
+      toast('Image ' + (idx + 1) + ' : erreur de lecture du fichier.', 'err');
     };
     reader.readAsDataURL(file);
   }
 
   /* ── Assigne plusieurs fichiers aux slots vides dans l'ordre ── */
   function assignFiles(files) {
+    var added = 0;
     var si = 0;
     for (var fi = 0; fi < files.length; fi++) {
       if (si >= 9) break;
-      while (si < 9 && slots[si]) si++;
+      while (si < 9 && slots[si] && slots[si] !== 'loading') si++;
       if (si >= 9) break;
-      if (files[fi].type.startsWith('image/') || files[fi].name.match(/\.(avif|heic|heif)$/i)) {
+      if (files[fi].type.startsWith('image/') || /\.(avif|heic|heif)$/i.test(files[fi].name)) {
         loadFileIntoSlot(files[fi], si);
+        added++;
       }
       si++;
     }
+    if (added === 0) toast('Aucune image reconnue dans la sélection.', 'err');
+    else if (added === 1) toast('1 image en cours de chargement…', 'info', 2000);
+    else toast(added + ' images en cours de chargement…', 'info', 2000);
   }
 
-  /* ── Entrée fichier principale (label for déclenche nativement) ── */
+  /* ── Input principal (label for déclenche nativement) ── */
   fileInput.addEventListener('change', function () {
     assignFiles(Array.from(fileInput.files));
     fileInput.value = '';
@@ -324,19 +476,18 @@
 
   /* ── Création de la grille ── */
   createBtn.addEventListener('click', function () {
-    var count = slots.filter(Boolean).length;
-    if (count < 9) return;
+    var filled = slots.filter(function (s) { return s && s !== 'loading' && !s.error; });
+    if (filled.length < 9) return;
 
     var cellSize = parseInt(cellSizeSel.value, 10);
     var gap      = parseInt(gapSel.value, 10);
     var bgColor  = bgColorIn.value;
     var total    = cellSize * 3 + gap * 2;
 
-    progressDiv.style.display = 'block';
+    genProgress.style.display = 'block';
     resultDiv.style.display   = 'none';
     createBtn.disabled        = true;
 
-    /* setTimeout 0 pour laisser le DOM se mettre à jour avant le calcul lourd */
     setTimeout(function () {
       try {
         var canvas = document.createElement('canvas');
@@ -352,7 +503,6 @@
           var col = i % 3;
           var x   = col * (cellSize + gap);
           var y   = row * (cellSize + gap);
-
           var src = slots[i].imgEl;
           var sw  = src.naturalWidth;
           var sh  = src.naturalHeight;
@@ -360,15 +510,10 @@
           /* Recadrage centré (object-fit: cover) */
           var sSize, sx, sy;
           if (sw > sh) {
-            sSize = sh;
-            sx = Math.floor((sw - sh) / 2);
-            sy = 0;
+            sSize = sh; sx = Math.floor((sw - sh) / 2); sy = 0;
           } else {
-            sSize = sw;
-            sx = 0;
-            sy = Math.floor((sh - sw) / 2);
+            sSize = sw; sx = 0; sy = Math.floor((sh - sw) / 2);
           }
-
           ctx.drawImage(src, sx, sy, sSize, sSize, x, y, cellSize, cellSize);
         }
 
@@ -376,19 +521,18 @@
         resultImg.src   = dataUrl;
         dlLink.href     = dataUrl;
 
-        progressDiv.style.display = 'none';
+        genProgress.style.display = 'none';
         resultDiv.style.display   = 'block';
         createBtn.disabled        = false;
-
-        /* Scroll doux vers le résultat */
+        toast('Grille créée avec succès !', 'ok', 3500);
         resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       } catch (err) {
-        progressDiv.style.display = 'none';
+        genProgress.style.display = 'none';
         createBtn.disabled = false;
-        alert('Erreur lors de la création : ' + err.message + '\n\nAssurez-vous que toutes les images sont accessibles (pas de blocage CORS).');
+        toast('Erreur lors de la création : ' + err.message, 'err', 6000);
       }
-    }, 50);
+    }, 60);
   });
 
   /* ── Réinitialisation ── */
@@ -397,6 +541,7 @@
     for (var i = 0; i < 9; i++) renderSlot(i);
     updateUI();
     resultDiv.style.display = 'none';
+    toast('Réinitialisé.', 'info', 2000);
     uploadZone.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
